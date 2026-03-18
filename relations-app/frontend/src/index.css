@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #ffffff; /* Чистый белый по умолчанию для light */
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000000; /* Чистый чёрный для dark */
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Тени для форм и боксов */
+.MuiBox-root {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
+  border-radius: 8px;
+  padding: 16px;
+  background-color: inherit; /* Подхватывает тему */
+}
+
+/* Опционально: добавь лёгкий романтический градиент только если нужно */
+body.light-theme {
+  background-image: url('assets/lightThemeBackground.jpg'); /* Или путь к файлу */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Фон не скроллится */
+}
+
+body.dark-theme {
+  background-image: url('assets/darkThemeBackground.jpg.jpg'); /* Или путь к файлу */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* затемнение фона для читаемости текста */
+body.light-theme::before,
+body.dark-theme::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5); /* полупрозрачный белый оверлей для светлой темы */
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.dark-theme::before {
+  background-color: rgba(0, 0, 0, 0.5); /* полупрозрачный чёрный для темной */
+}
