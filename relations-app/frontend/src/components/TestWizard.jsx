@@ -172,7 +172,7 @@ const TestWizard = () => {
         return (
           <Box>
             <Typography variant="h6">Оценка общей удовлетворённости отношениями</Typography>
-            <Typography variant="body1">Оцените каждую черту по шкале от 0 до 100 с учетом ваших отношений</Typography>
+            <Typography variant="body1">Насколько вы в целом удовлетворены своими отношениями?</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
               <Typography variant="h2">
                 {getEmoji(overall)}

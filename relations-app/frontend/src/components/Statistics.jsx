@@ -27,7 +27,6 @@ const ComparisonDiagram = ({ center, items }) => {
         {/* Центр */}
         <circle cx={cx} cy={cy} r={centerRadius} fill="lightblue" />
         <text x={cx} y={cy} textAnchor="middle" dy=".3em" fontSize="14">{center.label}</text>
-        <text x={cx} y={cy + 20} textAnchor="middle" fontSize="12">({center.avg.toFixed(2)})</text>
 
         {/* Элементы вокруг */}
         {items.map((item, i) => {
@@ -40,7 +39,6 @@ const ComparisonDiagram = ({ center, items }) => {
             <g key={i}>
               <circle cx={x} cy={y} r={itemRadius} fill="lightgray" />
               <text x={x} y={y} textAnchor="middle" dy=".3em" fontSize="14">{item.label}</text>
-              <text x={x} y={y + 20} textAnchor="middle" fontSize="12">({item.avg.toFixed(2)})</text>
             </g>
           );
         })}
