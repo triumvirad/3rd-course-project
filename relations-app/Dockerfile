@@ -1,6 +1,7 @@
 FROM golang:1.25.0-alpine AS builder
 WORKDIR /app
-COPY . .
+COPY backend/ /app/
+WORKDIR /app
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
