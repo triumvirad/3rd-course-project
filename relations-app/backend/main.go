@@ -32,6 +32,9 @@ func main() {
 
 	var err error
 	db, err = sql.Open("postgres", connStr)
+	if err := createDb(db); err != nil {
+		log.Fatal("Не удалось инициализировать базу данных:", err)
+	}
 	if err != nil {
 		log.Fatal("Не удалось подключиться к базе данных:", err)
 	}
@@ -42,9 +45,12 @@ func main() {
 	router.HandleFunc("/api/statistics", statsHandler).Methods("GET")
 	router.HandleFunc("/api/regions", regionsHandler).Methods("GET")
 
-	// Добавляем CORS middleware
-	fmt.Println("Server starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", corsMiddleware(router)))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	fmt.Println("Server starting on :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, corsMiddleware(router)))
 }
 
 // CORS middleware
