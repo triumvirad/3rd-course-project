@@ -48,7 +48,10 @@ const Result = () => {
 
   // Итоговый S_COMMIT
   const bsat = testData.overall / 100;
-  const scommit = (normP / (normN || 1)) * bsat * 100; // Избежать деления на 0
+  const scommit = Math.min(
+    (normP / (normN || 1)) * bsat * 100,
+    100
+  ); 
 
   return (
     <Box textAlign="center">

@@ -54,8 +54,12 @@ func calculateScore(positivesJSON, negativesJSON []byte, overall int) (float64, 
 	if normNeg == 0 {
 		normNeg = 0.0001 // Избежать деления на 0, маленькое значение
 	}
-
-	// Итоговый scom * 100 для %
 	scom := (normPos / normNeg) * (float64(overall) / 100.0)
+	score := scom * 100
+
+	if score > 100 {
+		score = 100
+	}
+
 	return scom * 100, nil
 }
