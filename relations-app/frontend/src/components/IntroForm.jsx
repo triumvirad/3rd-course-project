@@ -24,23 +24,23 @@ const IntroForm = () => {
   const [options, setOptions] = useState({ countries: [], educations: [], statuses: [] });
   const [regions, setRegions] = useState([]);
   const selectedCountry = watch('country');
-
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
   useEffect(() => {
-    axios.get('http://localhost:8080/api/start')
+    axios.get(`${API_URL}/api/start`)
       .then(res => setOptions(res.data))
       .catch(err => console.error('Error loading options:', err));
-  }, []);
+  }, [API_URL]);
 
   useEffect(() => {
     if (selectedCountry) {
-      axios.get(`http://localhost:8080/api/regions?country=${encodeURIComponent(selectedCountry)}`)
+      axios.get(`${API_URL}/api/regions?country=${encodeURIComponent(selectedCountry)}`)
         .then(res => setRegions(res.data.regions || []))
         .catch(err => console.error('Error loading regions:', err));
       setValue('region', '');
     } else {
       setRegions([]);
     }
-  }, [selectedCountry, setValue]);
+  }, [selectedCountry, setValue, API_URL]);
 
   const onSubmit = (data) => {
     if (!data.consent) return;

@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -17,17 +18,22 @@ var db *sql.DB
 
 func main() {
 	// Подключение к БД
-	connStr := "user=postgres dbname=relations_app password=ivanator1201 sslmode=disable"
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		connStr = fmt.Sprintf(
+			"user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_NAME"),
+			os.Getenv("DB_PASSWORD"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+		)
+	}
+
 	var err error
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Создание таблиц
-	if err := createDb(db); err != nil {
-		log.Fatal("Failed to create tables:", err)
+		log.Fatal("Не удалось подключиться к базе данных:", err)
 	}
 
 	router := mux.NewRouter()

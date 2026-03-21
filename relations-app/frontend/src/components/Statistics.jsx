@@ -113,17 +113,17 @@ const Statistics = () => {
   const [userCountry, setUserCountry] = useState('');
   const [userRegion, setUserRegion] = useState('');
   const [userEducation, setUserEducation] = useState('');
-
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
   useEffect(() => {
     const introData = JSON.parse(localStorage.getItem('introData') || '{}');
     setUserCountry(introData.country || 'Неизвестно');
     setUserRegion(introData.region || 'Не указан');
     setUserEducation(introData.education || 'Неизвестно');
 
-    axios.get('http://localhost:8080/api/statistics')
+    axios.get(`${API_URL}/api/statistics`)
       .then(res => setStats(res.data))
       .catch(err => console.error('Stats error:', err));
-  }, []);
+  }, [API_URL]);
 
   // Функция для генерации фраз сравнений (только для gender)
   const generateComparison = (group, items) => {

@@ -42,14 +42,14 @@ const TestWizard = () => {
     console.log('introData из localStorage:', introData);
     console.log('Полный объект data:', data);
     console.log('JSON body для отправки:', JSON.stringify(data));
-
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
     localStorage.setItem('testData', JSON.stringify({
       positiveTraits,
       negativeTraits,
       overall
     }));
 
-    axios.post('http://localhost:8080/api/submit-form', data)
+    axios.post(`${API_URL}/api/submit-form`, data)
       .then(res => {
         localStorage.setItem('result', JSON.stringify(res.data));
         navigate('/result');
