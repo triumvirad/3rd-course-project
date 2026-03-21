@@ -45,6 +45,7 @@ func main() {
 	router.HandleFunc("/api/submit-form", submitHandler).Methods("POST")
 	router.HandleFunc("/api/statistics", statsHandler).Methods("GET")
 	router.HandleFunc("/api/regions", regionsHandler).Methods("GET")
+	router.HandleFunc("/api/clean", cleanHandler).Methods("GET")
 	router.HandleFunc("/api/seed", seedHandler).Methods("GET")
 
 	port := os.Getenv("PORT")
@@ -346,6 +347,19 @@ func regionsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string][]string{"regions": regions})
 }
 
+func cleanHandler(w http.ResponseWriter, r *http.Request) {
+	_, err1 := db.Exec("DELETE FROM test_results")
+	_, err2 := db.Exec("DELETE FROM user_profiles")
+
+	msg := "Таблицы очищены"
+	if err1 != nil || err2 != nil {
+		msg = fmt.Sprintf("Ошибка: %v %v", err1, err2)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"message": msg})
+}
+
 func seedHandler(w http.ResponseWriter, r *http.Request) {
 	// 1. Очищаем таблицы перед вставкой новых данных
 	_, err := db.Exec("DELETE FROM test_results")
@@ -411,62 +425,6 @@ func seedHandler(w http.ResponseWriter, r *http.Request) {
 		{"female", 27, "Высшее неоконченное", "Россия", "Ленинградская область", "Одинок(а)",
 			`[{"trait":"Страсть","rank":1,"score":89},{"trait":"Эмпатия","rank":2,"score":92},{"trait":"Красота","rank":3,"score":90},{"trait":"Юмор","rank":4,"score":86},{"trait":"Честность","rank":5,"score":83}]`,
 			`[{"trait":"Эгоизм","rank":1,"score":38},{"trait":"Ревность","rank":2,"score":45},{"trait":"Молчаливость","rank":3,"score":30},{"trait":"Опоздания","rank":4,"score":28},{"trait":"Критика","rank":5,"score":22}]`, 77},
-
-		{"male", 36, "Высшее оконченное", "Россия", "Самарская область", "Женат/Замужем",
-			`[{"trait":"Стабильность","rank":1,"score":93},{"trait":"Надёжность","rank":2,"score":90},{"trait":"Поддержка","rank":3,"score":88},{"trait":"Интеллект","rank":4,"score":85},{"trait":"Забота","rank":5,"score":82}]`,
-			`[{"trait":"Упрямство","rank":1,"score":40},{"trait":"Лень","rank":2,"score":42},{"trait":"Ревность","rank":3,"score":35},{"trait":"Забывчивость","rank":4,"score":30},{"trait":"Критика","rank":5,"score":25}]`, 75},
-
-		{"female", 29, "Учёная степень", "Россия", "Свердловская область", "Состою в романтических отношениях",
-			`[{"trait":"Мудрость","rank":1,"score":95},{"trait":"Эмпатия","rank":2,"score":93},{"trait":"Честность","rank":3,"score":91},{"trait":"Поддержка","rank":4,"score":89},{"trait":"Оптимизм","rank":5,"score":87}]`,
-			`[{"trait":"Перфекционизм","rank":1,"score":28},{"trait":"Ревность","rank":2,"score":22},{"trait":"Критика","rank":3,"score":30},{"trait":"Опоздания","rank":4,"score":25},{"trait":"Эмоциональность","rank":5,"score":20}]`, 88},
-
-		{"male", 32, "Среднее профессиональное", "Россия", "Челябинская область", "Женат/Замужем",
-			`[{"trait":"Надёжность","rank":1,"score":90},{"trait":"Юмор","rank":2,"score":86},{"trait":"Забота","rank":3,"score":88},{"trait":"Стабильность","rank":4,"score":84},{"trait":"Интеллект","rank":5,"score":81}]`,
-			`[{"trait":"Лень","rank":1,"score":45},{"trait":"Ревность","rank":2,"score":38},{"trait":"Забывчивость","rank":3,"score":35},{"trait":"Упрямство","rank":4,"score":32},{"trait":"Критика","rank":5,"score":28}]`, 71},
-
-		{"female", 24, "Высшее неоконченное", "Россия", "Нижегородская область", "Одинок(а)",
-			`[{"trait":"Красота","rank":1,"score":91},{"trait":"Эмпатия","rank":2,"score":88},{"trait":"Страсть","rank":3,"score":85},{"trait":"Юмор","rank":4,"score":83},{"trait":"Честность","rank":5,"score":80}]`,
-			`[{"trait":"Эгоизм","rank":1,"score":40},{"trait":"Ревность","rank":2,"score":45},{"trait":"Опоздания","rank":3,"score":35},{"trait":"Молчаливость","rank":4,"score":30},{"trait":"Критика","rank":5,"score":25}]`, 73},
-
-		{"male", 38, "Высшее оконченное", "Россия", "Воронежская область", "Женат/Замужем",
-			`[{"trait":"Стабильность","rank":1,"score":92},{"trait":"Надёжность","rank":2,"score":90},{"trait":"Поддержка","rank":3,"score":87},{"trait":"Забота","rank":4,"score":85},{"trait":"Интеллект","rank":5,"score":82}]`,
-			`[{"trait":"Упрямство","rank":1,"score":35},{"trait":"Лень","rank":2,"score":40},{"trait":"Ревность","rank":3,"score":30},{"trait":"Забывчивость","rank":4,"score":28},{"trait":"Критика","rank":5,"score":22}]`, 78},
-
-		{"female", 35, "Среднее профессиональное", "Россия", "Пермский край", "Состою в романтических отношениях",
-			`[{"trait":"Эмпатия","rank":1,"score":90},{"trait":"Честность","rank":2,"score":88},{"trait":"Оптимизм","rank":3,"score":85},{"trait":"Поддержка","rank":4,"score":83},{"trait":"Красота","rank":5,"score":80}]`,
-			`[{"trait":"Ревность","rank":1,"score":38},{"trait":"Перфекционизм","rank":2,"score":32},{"trait":"Опоздания","rank":3,"score":35},{"trait":"Критика","rank":4,"score":28},{"trait":"Эгоизм","rank":5,"score":25}]`, 79},
-
-		{"male", 27, "Высшее неоконченное", "Россия", "Красноярский край", "Одинок(а)",
-			`[{"trait":"Юмор","rank":1,"score":89},{"trait":"Надёжность","rank":2,"score":87},{"trait":"Страсть","rank":3,"score":85},{"trait":"Забота","rank":4,"score":83},{"trait":"Интеллект","rank":5,"score":80}]`,
-			`[{"trait":"Лень","rank":1,"score":48},{"trait":"Ревность","rank":2,"score":42},{"trait":"Забывчивость","rank":3,"score":38},{"trait":"Упрямство","rank":4,"score":35},{"trait":"Критика","rank":5,"score":30}]`, 66},
-
-		{"female", 40, "Учёная степень", "Россия", "Иркутская область", "Женат/Замужем",
-			`[{"trait":"Мудрость","rank":1,"score":94},{"trait":"Эмпатия","rank":2,"score":92},{"trait":"Честность","rank":3,"score":90},{"trait":"Поддержка","rank":4,"score":88},{"trait":"Оптимизм","rank":5,"score":85}]`,
-			`[{"trait":"Перфекционизм","rank":1,"score":30},{"trait":"Ревность","rank":2,"score":25},{"trait":"Критика","rank":3,"score":32},{"trait":"Опоздания","rank":4,"score":28},{"trait":"Эмоциональность","rank":5,"score":22}]`, 87},
-
-		{"male", 31, "Высшее оконченное", "Россия", "Омская область", "Состою в романтических отношениях",
-			`[{"trait":"Стабильность","rank":1,"score":91},{"trait":"Надёжность","rank":2,"score":89},{"trait":"Юмор","rank":3,"score":86},{"trait":"Забота","rank":4,"score":84},{"trait":"Интеллект","rank":5,"score":81}]`,
-			`[{"trait":"Упрямство","rank":1,"score":40},{"trait":"Лень","rank":2,"score":45},{"trait":"Ревность","rank":3,"score":35},{"trait":"Забывчивость","rank":4,"score":32},{"trait":"Критика","rank":5,"score":28}]`, 70},
-
-		{"female", 23, "Высшее неоконченное", "Россия", "Волгоградская область", "Одинок(а)",
-			`[{"trait":"Красота","rank":1,"score":93},{"trait":"Эмпатия","rank":2,"score":90},{"trait":"Страсть","rank":3,"score":88},{"trait":"Юмор","rank":4,"score":85},{"trait":"Честность","rank":5,"score":82}]`,
-			`[{"trait":"Эгоизм","rank":1,"score":35},{"trait":"Ревность","rank":2,"score":42},{"trait":"Опоздания","rank":3,"score":30},{"trait":"Молчаливость","rank":4,"score":28},{"trait":"Критика","rank":5,"score":25}]`, 75},
-
-		{"male", 45, "Среднее профессиональное", "Россия", "Саратовская область", "Женат/Замужем",
-			`[{"trait":"Надёжность","rank":1,"score":92},{"trait":"Стабильность","rank":2,"score":90},{"trait":"Поддержка","rank":3,"score":88},{"trait":"Забота","rank":4,"score":86},{"trait":"Интеллект","rank":5,"score":83}]`,
-			`[{"trait":"Лень","rank":1,"score":45},{"trait":"Ревность","rank":2,"score":38},{"trait":"Упрямство","rank":3,"score":35},{"trait":"Забывчивость","rank":4,"score":32},{"trait":"Критика","rank":5,"score":28}]`, 74},
-
-		{"female", 34, "Высшее оконченное", "Россия", "Кемеровская область", "Состою в романтических отношениях",
-			`[{"trait":"Эмпатия","rank":1,"score":90},{"trait":"Честность","rank":2,"score":88},{"trait":"Оптимизм","rank":3,"score":86},{"trait":"Поддержка","rank":4,"score":84},{"trait":"Красота","rank":5,"score":81}]`,
-			`[{"trait":"Ревность","rank":1,"score":40},{"trait":"Перфекционизм","rank":2,"score":35},{"trait":"Опоздания","rank":3,"score":32},{"trait":"Критика","rank":4,"score":30},{"trait":"Эгоизм","rank":5,"score":25}]`, 78},
-
-		{"male", 28, "Высшее неоконченное", "Россия", "Ставропольский край", "Одинок(а)",
-			`[{"trait":"Юмор","rank":1,"score":88},{"trait":"Надёжность","rank":2,"score":86},{"trait":"Страсть","rank":3,"score":84},{"trait":"Забота","rank":4,"score":82},{"trait":"Интеллект","rank":5,"score":80}]`,
-			`[{"trait":"Лень","rank":1,"score":50},{"trait":"Ревность","rank":2,"score":45},{"trait":"Забывчивость","rank":3,"score":40},{"trait":"Упрямство","rank":4,"score":35},{"trait":"Критика","rank":5,"score":30}]`, 65},
-
-		{"female", 37, "Учёная степень", "Россия", "Хабаровский край", "Женат/Замужем",
-			`[{"trait":"Мудрость","rank":1,"score":95},{"trait":"Эмпатия","rank":2,"score":93},{"trait":"Честность","rank":3,"score":91},{"trait":"Поддержка","rank":4,"score":89},{"trait":"Оптимизм","rank":5,"score":87}]`,
-			`[{"trait":"Перфекционизм","rank":1,"score":30},{"trait":"Ревность","rank":2,"score":25},{"trait":"Критика","rank":3,"score":32},{"trait":"Опоздания","rank":4,"score":28},{"trait":"Эмоциональность","rank":5,"score":22}]`, 89},
 	}
 
 	count := 0
