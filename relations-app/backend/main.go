@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -39,14 +38,13 @@ func main() {
 	if err != nil {
 		log.Fatal("Не удалось подключиться к базе данных:", err)
 	}
+	log.Println("База инициализирована, страны:", getCountriesCount()) // Вывод количества стран для проверки
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/start", startHandler).Methods("GET")
 	router.HandleFunc("/api/submit-form", submitHandler).Methods("POST")
 	router.HandleFunc("/api/statistics", statsHandler).Methods("GET")
 	router.HandleFunc("/api/regions", regionsHandler).Methods("GET")
-	router.HandleFunc("/api/clean", cleanHandler).Methods("GET")
-	router.HandleFunc("/api/seed", seedHandler).Methods("GET")
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -68,6 +66,13 @@ func corsMiddleware(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+// Вспомогательная функция для получения количества стран в БД
+func getCountriesCount() int {
+	var count int
+	db.QueryRow("SELECT COUNT(*) FROM countries").Scan(&count)
+	return count
 }
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
@@ -345,132 +350,4 @@ func regionsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string][]string{"regions": regions})
-}
-
-func cleanHandler(w http.ResponseWriter, r *http.Request) {
-	_, err1 := db.Exec("DELETE FROM test_results")
-	_, err2 := db.Exec("DELETE FROM user_profiles")
-
-	msg := "Таблицы очищены"
-	if err1 != nil || err2 != nil {
-		msg = fmt.Sprintf("Ошибка: %v %v", err1, err2)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": msg})
-}
-
-func seedHandler(w http.ResponseWriter, r *http.Request) {
-	// 1. Очищаем таблицы перед вставкой новых данных
-	_, err := db.Exec("DELETE FROM test_results")
-	if err != nil {
-		http.Error(w, "Ошибка очистки test_results: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, err = db.Exec("DELETE FROM user_profiles")
-	if err != nil {
-		http.Error(w, "Ошибка очистки user_profiles: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	type FakeEntry struct {
-		Gender             string
-		Age                int
-		Education          string
-		Country            string
-		Region             string
-		RelationshipStatus string
-		PositiveTraits     string // строка JSON
-		NegativeTraits     string // строка JSON
-		Overall            int
-	}
-
-	entries := []FakeEntry{
-		{"male", 28, "Высшее оконченное", "Россия", "Москва", "Женат/Замужем",
-			`[{"trait":"Надёжность","rank":1,"score":95},{"trait":"Юмор","rank":2,"score":82},{"trait":"Поддержка","rank":3,"score":90},{"trait":"Интеллект","rank":4,"score":88},{"trait":"Забота","rank":5,"score":85}]`,
-			`[{"trait":"Ревность","rank":1,"score":35},{"trait":"Лень","rank":2,"score":40},{"trait":"Упрямство","rank":3,"score":28},{"trait":"Забывчивость","rank":4,"score":32},{"trait":"Критика","rank":5,"score":25}]`, 84},
-
-		{"female", 25, "Высшее неоконченное", "Россия", "Санкт-Петербург", "Состою в романтических отношениях",
-			`[{"trait":"Эмпатия","rank":1,"score":93},{"trait":"Красота","rank":2,"score":90},{"trait":"Страсть","rank":3,"score":87},{"trait":"Честность","rank":4,"score":92},{"trait":"Оптимизм","rank":5,"score":85}]`,
-			`[{"trait":"Ревность","rank":1,"score":45},{"trait":"Опоздания","rank":2,"score":38},{"trait":"Эгоизм","rank":3,"score":32},{"trait":"Критика","rank":4,"score":30},{"trait":"Молчаливость","rank":5,"score":25}]`, 76},
-
-		{"male", 34, "Среднее профессиональное", "Россия", "Новосибирская область", "Женат/Замужем",
-			`[{"trait":"Стабильность","rank":1,"score":91},{"trait":"Надёжность","rank":2,"score":89},{"trait":"Юмор","rank":3,"score":84},{"trait":"Поддержка","rank":4,"score":88},{"trait":"Забота","rank":5,"score":82}]`,
-			`[{"trait":"Лень","rank":1,"score":48},{"trait":"Ревность","rank":2,"score":42},{"trait":"Забывчивость","rank":3,"score":35},{"trait":"Упрямство","rank":4,"score":30},{"trait":"Критика","rank":5,"score":28}]`, 68},
-
-		{"female", 31, "Учёная степень", "Россия", "Екатеринбург", "Женат/Замужем",
-			`[{"trait":"Мудрость","rank":1,"score":96},{"trait":"Эмпатия","rank":2,"score":92},{"trait":"Интеллект","rank":3,"score":94},{"trait":"Честность","rank":4,"score":90},{"trait":"Поддержка","rank":5,"score":88}]`,
-			`[{"trait":"Перфекционизм","rank":1,"score":25},{"trait":"Ревность","rank":2,"score":20},{"trait":"Критика","rank":3,"score":30},{"trait":"Опоздания","rank":4,"score":22},{"trait":"Эмоциональность","rank":5,"score":18}]`, 91},
-
-		{"male", 29, "Высшее оконченное", "Россия", "Краснодарский край", "Состою в романтических отношениях",
-			`[{"trait":"Страсть","rank":1,"score":90},{"trait":"Юмор","rank":2,"score":88},{"trait":"Надёжность","rank":3,"score":85},{"trait":"Забота","rank":4,"score":87},{"trait":"Оптимизм","rank":5,"score":82}]`,
-			`[{"trait":"Ревность","rank":1,"score":40},{"trait":"Лень","rank":2,"score":45},{"trait":"Забывчивость","rank":3,"score":38},{"trait":"Упрямство","rank":4,"score":32},{"trait":"Критика","rank":5,"score":28}]`, 72},
-
-		{"female", 26, "Высшее неоконченное", "Россия", "Ростовская область", "Одинок(а)",
-			`[{"trait":"Красота","rank":1,"score":92},{"trait":"Эмпатия","rank":2,"score":89},{"trait":"Страсть","rank":3,"score":86},{"trait":"Честность","rank":4,"score":90},{"trait":"Юмор","rank":5,"score":84}]`,
-			`[{"trait":"Эгоизм","rank":1,"score":35},{"trait":"Ревность","rank":2,"score":42},{"trait":"Опоздания","rank":3,"score":30},{"trait":"Критика","rank":4,"score":28},{"trait":"Молчаливость","rank":5,"score":25}]`, 74},
-
-		{"male", 42, "Высшее оконченное", "Россия", "Татарстан", "Женат/Замужем",
-			`[{"trait":"Стабильность","rank":1,"score":94},{"trait":"Надёжность","rank":2,"score":92},{"trait":"Поддержка","rank":3,"score":90},{"trait":"Интеллект","rank":4,"score":88},{"trait":"Забота","rank":5,"score":85}]`,
-			`[{"trait":"Упрямство","rank":1,"score":38},{"trait":"Лень","rank":2,"score":45},{"trait":"Ревность","rank":3,"score":30},{"trait":"Забывчивость","rank":4,"score":35},{"trait":"Критика","rank":5,"score":25}]`, 80},
-
-		{"female", 33, "Высшее оконченное", "Россия", "Башкортостан", "Женат/Замужем",
-			`[{"trait":"Эмпатия","rank":1,"score":91},{"trait":"Честность","rank":2,"score":89},{"trait":"Поддержка","rank":3,"score":87},{"trait":"Оптимизм","rank":4,"score":85},{"trait":"Красота","rank":5,"score":82}]`,
-			`[{"trait":"Ревность","rank":1,"score":32},{"trait":"Перфекционизм","rank":2,"score":28},{"trait":"Опоздания","rank":3,"score":35},{"trait":"Критика","rank":4,"score":25},{"trait":"Эгоизм","rank":5,"score":20}]`, 82},
-
-		{"male", 30, "Среднее профессиональное", "Россия", "Московская область", "Состою в романтических отношениях",
-			`[{"trait":"Надёжность","rank":1,"score":88},{"trait":"Юмор","rank":2,"score":85},{"trait":"Забота","rank":3,"score":90},{"trait":"Стабильность","rank":4,"score":84},{"trait":"Интеллект","rank":5,"score":80}]`,
-			`[{"trait":"Лень","rank":1,"score":50},{"trait":"Ревность","rank":2,"score":40},{"trait":"Забывчивость","rank":3,"score":38},{"trait":"Упрямство","rank":4,"score":35},{"trait":"Критика","rank":5,"score":30}]`, 69},
-
-		{"female", 27, "Высшее неоконченное", "Россия", "Ленинградская область", "Одинок(а)",
-			`[{"trait":"Страсть","rank":1,"score":89},{"trait":"Эмпатия","rank":2,"score":92},{"trait":"Красота","rank":3,"score":90},{"trait":"Юмор","rank":4,"score":86},{"trait":"Честность","rank":5,"score":83}]`,
-			`[{"trait":"Эгоизм","rank":1,"score":38},{"trait":"Ревность","rank":2,"score":45},{"trait":"Молчаливость","rank":3,"score":30},{"trait":"Опоздания","rank":4,"score":28},{"trait":"Критика","rank":5,"score":22}]`, 77},
-	}
-
-	count := 0
-	for _, e := range entries {
-		var profileID int
-		err := db.QueryRow(`
-			INSERT INTO user_profiles (gender, age, education, country_id, region_id, relationship_status, consent)
-			SELECT $1, $2, $3, c.id, r.id, $4, true
-			FROM countries c
-			JOIN regions r ON r.country_id = c.id
-			WHERE c.name = $5 AND r.name = $6
-			RETURNING id
-		`, e.Gender, e.Age, e.Education, e.RelationshipStatus, e.Country, e.Region).Scan(&profileID)
-
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Ошибка вставки профиля для %s (%s): %v", e.Region, e.Gender, err), http.StatusInternalServerError)
-			return
-		}
-
-		score, calcErr := calculateScore([]byte(e.PositiveTraits), []byte(e.NegativeTraits), e.Overall)
-		if calcErr != nil {
-			score = 70.0 // fallback, если расчёт сломался
-		}
-
-		// Ограничиваем score до 100
-		if score > 100 {
-			score = 100
-		}
-
-		_, err = db.Exec(`
-			INSERT INTO test_results (profile_id, positive_traits, negative_traits, overall_satisfaction, calculated_score)
-			VALUES ($1, $2, $3, $4, $5)
-		`, profileID, e.PositiveTraits, e.NegativeTraits, e.Overall, score)
-
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Ошибка вставки результата для %s: %v", e.Region, err), http.StatusInternalServerError)
-			return
-		}
-
-		count++
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status":    "success",
-		"message":   fmt.Sprintf("Добавлено %d тестовых записей (все Россия)", count),
-		"timestamp": time.Now().Format("2006-01-02 15:04:05"),
-	})
 }
