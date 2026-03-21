@@ -102,7 +102,6 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	log.Println("Request body: ", string(body)) // Дебаг
 
 	var data SubmitData
 	if err := json.Unmarshal(body, &data); err != nil {
@@ -129,20 +128,19 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Находим region_id по name и country_id
-	var regionID sql.NullInt32
-	if data.Region != "" {
-		err = db.QueryRow("SELECT id FROM regions WHERE name = $1 AND country_id = $2", data.Region, countryID).Scan(&regionID.Int32)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				http.Error(w, "Invalid region for selected country", http.StatusBadRequest)
-			} else {
-				http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
-			}
-			return
+	var regionID int
+	err = db.QueryRow(
+		"SELECT id FROM regions WHERE name = $1 AND country_id = $2",
+		data.Region, countryID,
+	).Scan(&regionID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Указан неверный регион для выбранной страны", http.StatusBadRequest)
+		} else {
+			http.Error(w, "Ошибка базы данных (регион): "+err.Error(), http.StatusInternalServerError)
 		}
-		regionID.Valid = true
-	} else {
-		regionID.Valid = false
+		return
 	}
 
 	// Рассчёт score

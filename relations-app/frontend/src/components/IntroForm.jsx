@@ -92,8 +92,8 @@ const IntroForm = () => {
 
       <FormControl fullWidth margin="normal" error={!!errors.region}>
         <InputLabel>Регион</InputLabel>
-        <Select {...register('region', { required: false })} disabled={regions.length === 0}>
-          <MenuItem value="">Не указан</MenuItem>
+        <Select {...register('region', { required: true })} disabled={regions.length === 0}>
+          <MenuItem value="">Выберите регион</MenuItem>
           {regions.map((reg, i) => <MenuItem key={i} value={reg}>{reg}</MenuItem>)}
         </Select>
         {regions.length === 0 && selectedCountry && <Typography color="info">Регионы загружаются...</Typography>}
