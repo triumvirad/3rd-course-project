@@ -319,7 +319,7 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(stats)
 }
 
-// Новый обработчик — возвращает регионы для выбранной страны
+// Возвращает регионы для выбранной страны
 func regionsHandler(w http.ResponseWriter, r *http.Request) {
 	countryName := r.URL.Query().Get("country")
 	if countryName == "" {

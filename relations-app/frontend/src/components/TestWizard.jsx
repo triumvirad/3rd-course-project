@@ -155,7 +155,7 @@ const TestWizard = () => {
         return (
           <Box>
             <Typography variant="h6">Оценка черт</Typography>
-            <Typography variant="body1">Оцените каждую черту по шкале от 0 до 100 с учетом ваших отношений</Typography>
+            <Typography variant="body1">Оцените каждую черту по шкале от 0 до 100 с учетом ваших отношений. Более высокий балл означает, что черта более выражена в ваших отношениях. 0 баллов означает, что черта вообще отсутствует.</Typography>
             {[...positives, ...negatives].map((trait, i) => (
               <Box key={i} margin="normal">
                 <Typography>{trait || `Черта ${i + 1}`}</Typography>

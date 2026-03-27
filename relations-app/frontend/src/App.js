@@ -21,27 +21,27 @@ function App() {
       palette: {
         mode: darkMode ? 'dark' : 'light',
         primary: {
-          main: darkMode ? '#bb86fc' : '#6200ee', // Фиолетовый для кнопок (романтично)
+          main: darkMode ? '#bb86fc' : '#6200ee', 
         },
         secondary: {
-          main: darkMode ? '#03dac6' : '#03dac6', // Бирюзовый акцент
+          main: darkMode ? '#03dac6' : '#03dac6', 
         },
         background: {
-          default: darkMode ? '#121212' : '#f4f4f4', // Мягкий фон
-          paper: darkMode ? '#424242' : '#ffffff',   // Для карточек/форм
+          default: darkMode ? '#121212' : '#f4f4f4', 
+          paper: darkMode ? '#424242' : '#ffffff',   
         },
       },
       typography: {
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif', // Стандарт, но можно добавить Google Fonts
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         h6: {
-          fontWeight: 600, // Чуть жирнее заголовки шагов
+          fontWeight: 600, 
         },
       },
       components: {
         MuiButton: {
           styleOverrides: {
             root: {
-              borderRadius: 8, // Мягкие углы кнопок
+              borderRadius: 8, 
               textTransform: 'none',
             },
           },
@@ -49,7 +49,7 @@ function App() {
         MuiSlider: {
           styleOverrides: {
             root: {
-              color: darkMode ? '#bb86fc' : '#6200ee', // Цвет слайдера под тему
+              color: darkMode ? '#bb86fc' : '#6200ee', 
             },
           },
         },

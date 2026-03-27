@@ -5,12 +5,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #ffffff; /* Чистый белый по умолчанию для light */
+  background: #ffffff; 
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background: #000000; /* Чистый чёрный для dark */
+    background: #000000; 
   }
 }
 
@@ -19,32 +19,29 @@ code {
     monospace;
 }
 
-/* Тени для форм и боксов */
 .MuiBox-root {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 16px;
-  background-color: inherit; /* Подхватывает тему */
+  background-color: inherit;
 }
 
-/* Опционально: добавь лёгкий романтический градиент только если нужно */
 body.light-theme {
-  background-image: url('assets/lightThemeBackground.jpg'); /* Или путь к файлу */
+  background-image: url('assets/lightThemeBackground.jpg'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed; /* Фон не скроллится */
+  background-attachment: fixed; 
 }
 
 body.dark-theme {
-  background-image: url('assets/darkThemeBackground.jpg.jpg'); /* Или путь к файлу */
+  background-image: url('assets/darkThemeBackground.jpg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
-/* затемнение фона для читаемости текста */
 body.light-theme::before,
 body.dark-theme::before {
   content: '';
@@ -53,11 +50,11 @@ body.dark-theme::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.5); /* полупрозрачный белый оверлей для светлой темы */
+  background-color: rgba(255, 255, 255, 0.5); 
   pointer-events: none;
   z-index: -1;
 }
 
 body.dark-theme::before {
-  background-color: rgba(0, 0, 0, 0.5); /* полупрозрачный чёрный для темной */
+  background-color: rgba(0, 0, 0, 0.5); 
 }

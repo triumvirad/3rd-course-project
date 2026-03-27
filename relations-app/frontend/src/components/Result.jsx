@@ -20,7 +20,6 @@ const Result = () => {
 
   if (!result || !testData) return <Typography>Загрузка...</Typography>;
 
-  // Вес по рангу: 1 - самая важная (0.5), 5 - наименьшая (0.1)
   const getWeight = (rank) => {
     switch (rank) {
       case 1: return 0.5;
@@ -32,21 +31,17 @@ const Result = () => {
     }
   };
 
-  // Отсортировать черты по рангу (1-5)
   const sortedPositive = [...testData.positiveTraits].sort((a, b) => a.rank - b.rank);
   const sortedNegative = [...testData.negativeTraits].sort((a, b) => a.rank - b.rank);
 
-  // Расчёт ∑P × W
   const positiveCalcs = sortedPositive.map(trait => (trait.score / 100) * getWeight(trait.rank));
   const sumP = positiveCalcs.reduce((a, b) => a + b, 0);
   const normP = sumP / 1.5;
 
-  // Расчёт ∑N × W
   const negativeCalcs = sortedNegative.map(trait => (trait.score / 100) * getWeight(trait.rank));
   const sumN = negativeCalcs.reduce((a, b) => a + b, 0);
   const normN = sumN / 1.5;
 
-  // Итоговый S_COMMIT
   const bsat = testData.overall / 100;
   const scommit = Math.min(
     (normP / (normN || 1)) * bsat * 100,

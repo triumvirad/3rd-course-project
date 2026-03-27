@@ -24,7 +24,6 @@ const ComparisonDiagram = ({ center, items }) => {
           </marker>
         </defs>
 
-        {/* Центр */}
         <circle cx={cx} cy={cy} r={centerRadius} fill="lightblue" />
         <text x={cx} y={cy} textAnchor="middle" dy=".3em" fontSize="14">{center.label}</text>
 
@@ -47,7 +46,6 @@ const ComparisonDiagram = ({ center, items }) => {
         {items.map((item, i) => {
           const diff = center.avg - item.avg;
           if (diff === 0) {
-            // Серая пунктирная линия без стрелки
             const dx = item.x - cx;
             const dy = item.y - cy;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -125,7 +123,6 @@ const Statistics = () => {
       .catch(err => console.error('Stats error:', err));
   }, [API_URL]);
 
-  // Функция для генерации фраз сравнений (только для gender)
   const generateComparison = (group, items) => {
     if (!items || Object.keys(items).length < 2) return ['Недостаточно данных для сравнения.'];
     const sorted = Object.entries(items).sort((a, b) => b[1] - a[1]);
@@ -148,13 +145,11 @@ const Statistics = () => {
       <Typography variant="h5">Статистика </Typography>
       <Typography>Все относительно, это не замена профессиональной консультации.</Typography>
       
-      {/* По полу */}
       <Typography variant="h6" style={{ marginTop: '20px' }}>По полу</Typography>
       {generateComparison('gender', stats.gender || {}).map((phrase, i) => (
         <Typography key={i}>{phrase}</Typography>
       ))}
 
-      {/* По уровню образования */}
       <Typography variant="h6" style={{ marginTop: '20px' }}>По уровню образования</Typography>
       {userEducation !== 'Неизвестно' && stats.education && stats.education[userEducation] ? (
         <ComparisonDiagram
@@ -167,7 +162,6 @@ const Statistics = () => {
         <Typography>Уровень образования не указан или недостаточно данных.</Typography>
       )}
 
-      {/* По стране */}
       <Typography variant="h6" style={{ marginTop: '20px' }}>По стране</Typography>
       {userCountry !== 'Неизвестно' && stats.country && stats.country[userCountry] !== undefined ? (
         <ComparisonDiagram
@@ -180,7 +174,6 @@ const Statistics = () => {
         <Typography>Страна не указана или недостаточно данных.</Typography>
       )}
 
-      {/* По региону */}
       <Typography variant="h6" style={{ marginTop: '20px' }}>По региону</Typography>
       {userRegion !== 'Не указан' && stats.regionsByCountry && stats.regionsByCountry[userCountry] && stats.regionsByCountry[userCountry][userRegion] !== undefined ? (
         <ComparisonDiagram
